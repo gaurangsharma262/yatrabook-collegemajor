@@ -72,7 +72,7 @@ app.post('/api/seed', async (req, res) => {
       return res.json({ success: true, message: `Already seeded: ${tCount} trains, ${fCount} flights, ${bCount} buses` });
     }
 
-    const { generateFallbackTrains, generateFallbackFlights, generateBuses } = require('../../data/seed-data');
+    const { generateFallbackTrains, generateFallbackFlights, generateBuses } = require('../data/seed-data');
     const trains  = generateFallbackTrains();
     const flights = generateFallbackFlights();
     const buses   = generateBuses();
