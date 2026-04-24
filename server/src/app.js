@@ -52,6 +52,46 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ─── One-time Seed Endpoint ────────────────────────────────────
+app.post('/api/seed', async (req, res) => {
+  const secret = req.headers['x-seed-secret'];
+  if (secret !== (env.JWT_SECRET || 'yatrabook_jwt_secret_2026_super_secure_key')) {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+  try {
+    const Train  = require('./models/Train');
+    const Flight = require('./models/Flight');
+    const Bus    = require('./models/Bus');
+    const User   = require('./models/User');
+
+    const tCount = await Train.countDocuments();
+    const fCount = await Flight.countDocuments();
+    const bCount = await Bus.countDocuments();
+
+    if (tCount > 0 || fCount > 0 || bCount > 0) {
+      return res.json({ success: true, message: `Already seeded: ${tCount} trains, ${fCount} flights, ${bCount} buses` });
+    }
+
+    const { generateFallbackTrains, generateFallbackFlights, generateBuses } = require('../../data/seed-data');
+    const trains  = generateFallbackTrains();
+    const flights = generateFallbackFlights();
+    const buses   = generateBuses();
+
+    await Train.insertMany(trains);
+    await Flight.insertMany(flights);
+    await Bus.insertMany(buses);
+
+    const existing = await User.findOne({ email: 'demo@yatrabook.com' });
+    if (!existing) {
+      await User.create({ name: 'Demo User', email: 'demo@yatrabook.com', password: 'demo123456', phone: '9876543210', role: 'user' });
+    }
+
+    res.json({ success: true, message: `Seeded: ${trains.length} trains, ${flights.length} flights, ${buses.length} buses. Demo: demo@yatrabook.com / demo123456` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // ─── API Routes ────────────────────────────────────────────────
 // Will be added in Phase 2-4
 app.use('/api/auth', require('./routes/auth.routes'));
