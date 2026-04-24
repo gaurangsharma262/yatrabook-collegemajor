@@ -7,7 +7,7 @@ import { SearchSkeleton } from '../components/skeletons/Skeleton';
 import { trainAPI, flightAPI, busAPI } from '../lib/api';
 import { formatPrice, formatTime } from '../lib/utils';
 import { SORT_OPTIONS, DEPARTURE_TIMES, TRAIN_CLASSES, FLIGHT_CLASSES, BUS_CLASSES, TRANSPORT_CONFIG } from '../lib/constants';
-import { IoFilterOutline, IoSwapHorizontalOutline, IoStar, IoTimeOutline, IoTrainOutline, IoAirplaneOutline, IoBusOutline, IoChevronForwardOutline } from 'react-icons/io5';
+import { IoFilterOutline, IoSwapHorizontalOutline, IoStar, IoTimeOutline, IoTrainOutline, IoAirplaneOutline, IoBusOutline, IoChevronForwardOutline, IoSearchOutline } from 'react-icons/io5';
 
 const transportIcons = { train: IoTrainOutline, flight: IoAirplaneOutline, bus: IoBusOutline };
 
