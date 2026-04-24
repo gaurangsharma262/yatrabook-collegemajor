@@ -10,8 +10,19 @@ const app = express();
 
 // ─── Security Middleware ───────────────────────────────────────
 app.use(helmet());
+
+const allowedOrigins = [
+  env.CLIENT_URL,
+  'http://localhost:5173',
+  'https://yatrabook-collegemajor-9wf3.vercel.app',
+].filter(Boolean);
+
 app.use(cors({
-  origin: env.CLIENT_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
