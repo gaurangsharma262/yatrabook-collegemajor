@@ -8,6 +8,19 @@ const startServer = async () => {
     // Connect to MongoDB
     await connectDB();
 
+    // Auto-seed database if empty (crucial for in-memory MongoDB)
+    const User = require('./models/User');
+    const Train = require('./models/Train');
+    if ((await User.countDocuments()) === 0) {
+      console.log('🌱 Database is empty! Auto-seeding initial data...');
+      const { generateFallbackTrains, generateFallbackFlights, generateBuses } = require('../data/seed-data');
+      await Train.insertMany(generateFallbackTrains());
+      await require('./models/Flight').insertMany(generateFallbackFlights());
+      await require('./models/Bus').insertMany(generateBuses());
+      await User.create({ name: 'Demo User', email: 'demo@yatrabook.com', password: 'demo123456', phone: '9876543210', role: 'user' });
+      console.log('✅ Auto-seed complete!');
+    }
+
     // Start Express server
     app.listen(env.PORT, () => {
       console.log('');
