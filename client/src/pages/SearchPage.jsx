@@ -36,6 +36,8 @@ export default function SearchPage({ type = 'train' }) {
   const Icon = transportIcons[type];
   const classOptions = type === 'train' ? TRAIN_CLASSES : type === 'flight' ? FLIGHT_CLASSES : BUS_CLASSES;
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     if (from && to) fetchResults();
     else setLoading(false);
@@ -43,6 +45,7 @@ export default function SearchPage({ type = 'train' }) {
 
   const fetchResults = async () => {
     setLoading(true);
+    setError(null);
     try {
       const params = { from, to, sort, ...(date && { date }), ...(departure && { departure }), ...(selectedClass && { class: selectedClass }) };
       const apiMap = { train: trainAPI.search, flight: flightAPI.search, bus: busAPI.search };
@@ -52,6 +55,7 @@ export default function SearchPage({ type = 'train' }) {
       setPagination(res.data.pagination || {});
     } catch (err) {
       console.error('Search failed:', err);
+      setError(err.message || 'Failed to connect to the backend server. Please make sure the backend is running.');
       setResults([]);
     } finally {
       setLoading(false);
@@ -179,6 +183,12 @@ export default function SearchPage({ type = 'train' }) {
           <div className="flex-1 min-w-0">
             {loading ? (
               <SearchSkeleton />
+            ) : error ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-12 text-center border border-red-500/20">
+                <IoSearchOutline size={48} className="mx-auto text-red-500/50 mb-4" />
+                <h3 className="text-xl font-display font-bold mb-2 text-red-400">Connection Error</h3>
+                <p className="text-text-secondary">{error}</p>
+              </motion.div>
             ) : results.length === 0 ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-12 text-center">
                 <IoSearchOutline size={48} className="mx-auto text-text-muted mb-4" />

@@ -1,6 +1,7 @@
 const app = require('./app');
 const connectDB = require('./config/db');
 const env = require('./config/env');
+const https = require('https');
 
 const startServer = async () => {
   try {
@@ -18,6 +19,19 @@ const startServer = async () => {
       console.log(`║  API:         http://localhost:${env.PORT}/api   ║`);
       console.log('╚═══════════════════════════════════════════╝');
       console.log('');
+
+      // Heartbeat to keep service alive on free tiers (like Render)
+      const externalUrl = process.env.RENDER_EXTERNAL_URL;
+      if (externalUrl) {
+        console.log(`💓 Heartbeat activated for: ${externalUrl}`);
+        setInterval(() => {
+          https.get(`${externalUrl}/api/health`, (res) => {
+            console.log(`[${new Date().toISOString()}] 💓 Heartbeat Ping: ${res.statusCode}`);
+          }).on('error', (err) => {
+            console.error(`💓 Heartbeat Error: ${err.message}`);
+          });
+        }, 14 * 60 * 1000); // 14 minutes
+      }
     });
   } catch (error) {
     console.error('Failed to start server:', error.message);

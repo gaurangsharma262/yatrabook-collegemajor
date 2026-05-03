@@ -3,16 +3,23 @@ const env = require('./env');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(env.MONGODB_URI);
+    // Attempt local connection with a very short timeout (2 seconds)
+    const conn = await mongoose.connect(env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 2000
+    });
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     console.log(`📦 Database: ${conn.connection.name}`);
   } catch (error) {
-    console.warn(`⚠️  MongoDB Atlas connection failed: ${error.message}`);
-    console.log('🔄 Falling back to in-memory MongoDB...');
+    console.warn(`⚠️  Primary MongoDB connection failed: ${error.message}`);
+    console.log('🔄 Fast-falling back to in-memory MongoDB for offline mode...');
     
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongod = await MongoMemoryServer.create();
+      const mongod = await MongoMemoryServer.create({
+        instance: {
+          startupTimeout: 60000 // Increase timeout to 60 seconds
+        }
+      });
       const uri = mongod.getUri();
       const conn = await mongoose.connect(uri);
       console.log(`✅ In-Memory MongoDB Connected: ${conn.connection.host}`);

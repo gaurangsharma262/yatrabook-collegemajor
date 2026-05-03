@@ -73,7 +73,7 @@ export default function HomePage() {
           {/* Background Image Overlay */}
           <div className="absolute inset-0">
             <img
-              src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1920&q=80"
+              src="/images/hero.jpg"
               alt=""
               className="w-full h-full object-cover opacity-[0.07]"
             />
@@ -305,9 +305,9 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { src: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e13?w=600&q=80', label: 'Indian Railways', sub: 'Connecting cities coast to coast' },
-                { src: 'https://images.unsplash.com/photo-1436491865332-7a61a109db05?w=600&q=80', label: 'Domestic Flights', sub: 'Fastest way to travel India' },
-                { src: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&q=80', label: 'Inter-City Buses', sub: 'Comfortable overnight journeys' },
+                { src: '/images/train.jpg', label: 'Indian Railways', sub: 'Connecting cities coast to coast' },
+                { src: '/images/flight.jpg', label: 'Domestic Flights', sub: 'Fastest way to travel India' },
+                { src: '/images/bus.jpg', label: 'Inter-City Buses', sub: 'Comfortable overnight journeys' },
               ].map((img, i) => (
                 <motion.div
                   key={i}
