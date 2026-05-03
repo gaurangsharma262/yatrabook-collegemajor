@@ -83,14 +83,20 @@ app.post('/api/seed', async (req, res) => {
 });
 
 // ─── API Routes ────────────────────────────────────────────────
-// Will be added in Phase 2-4
-app.use('/api/auth', require('./routes/auth.routes'));
-app.use('/api/users', require('./routes/user.routes'));
-app.use('/api/trains', require('./routes/train.routes'));
-app.use('/api/flights', require('./routes/flight.routes'));
-app.use('/api/buses', require('./routes/bus.routes'));
-app.use('/api/bookings', require('./routes/booking.routes'));
-app.use('/api/recommend', require('./routes/recommend.routes'));
+const routes = [
+  { path: 'auth', router: require('./routes/auth.routes') },
+  { path: 'users', router: require('./routes/user.routes') },
+  { path: 'trains', router: require('./routes/train.routes') },
+  { path: 'flights', router: require('./routes/flight.routes') },
+  { path: 'buses', router: require('./routes/bus.routes') },
+  { path: 'bookings', router: require('./routes/booking.routes') },
+  { path: 'recommend', router: require('./routes/recommend.routes') },
+];
+
+routes.forEach(({ path, router }) => {
+  app.use(`/api/${path}`, router); // Standard path
+  app.use(`/${path}`, router);     // Fallback if frontend VITE_API_URL is missing /api
+});
 
 // ─── Error Handling ────────────────────────────────────────────
 app.use(notFoundHandler);
