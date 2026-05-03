@@ -9,16 +9,35 @@ const startServer = async () => {
     await connectDB();
 
     // Auto-seed database if empty (crucial for in-memory MongoDB)
-    const User = require('./models/User');
-    const Train = require('./models/Train');
-    if ((await User.countDocuments()) === 0) {
-      console.log('🌱 Database is empty! Auto-seeding initial data...');
-      const { generateFallbackTrains, generateFallbackFlights, generateBuses } = require('../data/seed-data');
-      await Train.insertMany(generateFallbackTrains());
-      await require('./models/Flight').insertMany(generateFallbackFlights());
-      await require('./models/Bus').insertMany(generateBuses());
-      await User.create({ name: 'Demo User', email: 'demo@yatrabook.com', password: 'demo123456', phone: '9876543210', role: 'user' });
-      console.log('✅ Auto-seed complete!');
+    try {
+      const User = require('./models/User');
+      const Train = require('./models/Train');
+      const Flight = require('./models/Flight');
+      const Bus = require('./models/Bus');
+      const userCount = await User.countDocuments();
+      const trainCount = await Train.countDocuments();
+      console.log(`📊 DB check — Users: ${userCount}, Trains: ${trainCount}`);
+      if (userCount === 0 || trainCount === 0) {
+        console.log('🌱 Database is empty! Auto-seeding initial data...');
+        const { generateFallbackTrains, generateFallbackFlights, generateBuses } = require('../data/seed-data');
+        const trains = generateFallbackTrains();
+        const flights = generateFallbackFlights();
+        const buses = generateBuses();
+        console.log(`   Generated: ${trains.length} trains, ${flights.length} flights, ${buses.length} buses`);
+        await Train.insertMany(trains);
+        await Flight.insertMany(flights);
+        await Bus.insertMany(buses);
+        if (userCount === 0) {
+          await User.create({ name: 'Demo User', email: 'demo@yatrabook.com', password: 'demo123456', phone: '9876543210', role: 'user' });
+        }
+        const finalCount = await Train.countDocuments();
+        console.log(`✅ Auto-seed complete! Trains in DB: ${finalCount}`);
+      } else {
+        console.log(`✅ Database already seeded. Trains: ${trainCount}, Users: ${userCount}`);
+      }
+    } catch (seedErr) {
+      console.error('❌ Auto-seed failed:', seedErr.message);
+      console.error(seedErr.stack);
     }
 
     // Start Express server
