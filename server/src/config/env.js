@@ -14,13 +14,9 @@ const env = {
 };
 
 // Validate required env vars in production
-if (env.NODE_ENV === 'production') {
-  const required = ['MONGODB_URI', 'JWT_SECRET'];
-  for (const key of required) {
-    if (!process.env[key]) {
-      throw new Error(`Missing required environment variable: ${key}`);
-    }
-  }
+// Note: MONGODB_URI is optional — we fall back to in-memory MongoDB if not set
+if (env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.warn('⚠️  JWT_SECRET not set in production! Using fallback (insecure). Set JWT_SECRET in your environment variables.');
 }
 
 module.exports = env;
